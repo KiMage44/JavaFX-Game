@@ -56,22 +56,22 @@ public class Camera extends Entity{
     private void PlayerSyncY(double time){
         double TopB = this.getTop()+(this.getBottom()*0.3);
         double BottomB = this.getBottom()*0.7;
-        System.out.println("Player Y Velocity:"+this.player.physics.getVelocityY());
-        System.out.println("Camera Y Velocity: "+this.physics.getVelocityY());
-        System.out.println("Player Y Acceleration:"+this.player.physics.getAccelerationY());
-        System.out.println("Camera Y Acceleration: "+this.physics.getAccelerationY());
+        //System.out.println("Player Y Velocity:"+this.player.physics.getVelocityY());
+        //System.out.println("Camera Y Velocity: "+this.physics.getVelocityY());
+        //System.out.println("Player Y Acceleration:"+this.player.physics.getAccelerationY());
+        //System.out.println("Camera Y Acceleration: "+this.physics.getAccelerationY());
         if(this.player.getY() > BottomB && this.player.physics.getVelocityY() > 0){
-            System.out.println("Player has fallen to far down, forcing camera to follow");
+            //System.out.println("Player has fallen to far down, forcing camera to follow");
             this.physics.setVelocityY(this.player.physics.getVelocityY());
         }
         else if(this.player.getY() < TopB && this.player.physics.getVelocityY() < 0){
-            System.out.println("Player has risen to far up, forcing camera to follow");
+            //System.out.println("Player has risen to far up, forcing camera to follow");
             this.physics.setVelocityY(this.player.physics.getVelocityY());
         }
         else{
             this.physics.setVelocityY(0);
             this.physics.setAccelerationY(0);
-            System.out.println("Player in middle of Camera, no need for special changes.");
+            //System.out.println("Player in middle of Camera, no need for special changes.");
         
         }
         this.physics.calculateNetY(time);

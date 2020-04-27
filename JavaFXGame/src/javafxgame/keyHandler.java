@@ -18,6 +18,7 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
     Camera camera;
     String name;
     double value = 2;
+    double Vvalue = 20;
     double releasevalue = 0;
     keyHandler(Camera camera, String name){
         this.camera = camera;
@@ -65,21 +66,21 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
     }
     public void PlayerKeyPressed(KeyEvent event){
         if(event.getCode() == KeyCode.W || event.getCode() == KeyCode.UP){
-            player.physics.setAccelerationY(-value);
+            player.physics.setVelocityY(-Vvalue);
             //System.out.println("W pressed");
         }
         else if(event.getCode() == KeyCode.S || event.getCode() == KeyCode.DOWN){
-            player.physics.setAccelerationY(value);
+            player.physics.setVelocityY(Vvalue);
             //System.out.println("S pressed");
         }
     }
     public void PlayerKeyReleased(KeyEvent event){
         if(event.getCode() == KeyCode.W || event.getCode() == KeyCode.UP){
-            player.physics.setAccelerationY(releasevalue);
+            player.physics.setVelocityY(0);
             //System.out.println("W released");
         }
         else if(event.getCode() == KeyCode.S || event.getCode() == KeyCode.DOWN){
-            player.physics.setAccelerationY(-releasevalue);
+            player.physics.setVelocityY(0);
             //System.out.println("S released");
         }
     }

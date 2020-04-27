@@ -23,17 +23,27 @@ public class Entity {
     double width;
     double height;
     String name;
+    int health = 100;
     Physics physics = new Physics(this);
     Image image;
     ImageView entityVisual;
-    
+    Entity(int x, int y, int width, int height, String name, double xAcc, double yAcc) throws FileNotFoundException{
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.name = name;
+        this.physics.setAccelerationX(xAcc);
+        this.physics.setAccelerationY(yAcc);
+        this.setVisual("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Wall.png");
+    }
     Entity(int x, int y, int width, int height, String name) throws FileNotFoundException{
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.name = name;
-        this.setVisual("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\face.jpg");
+        this.setVisual("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Wall.png");
     }
     public void setX(double value){
         this.x = value;

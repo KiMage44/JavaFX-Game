@@ -5,6 +5,8 @@
  */
 package javafxgame;
 
+import static java.lang.System.exit;
+
 public class Physics {
     double mass = 2.0;
     double accelerationX;
@@ -63,9 +65,7 @@ public class Physics {
         //this.ResetForcesX();
     }
     public synchronized void calculateNetY(double time){
-        //this.setAccelerationY(this.netForceY/this.mass);
-        if(this.entity.name == "Camera")
-            System.out.println("Acc: "+this.getAccelerationY()+"\nVelocity: "+this.getVelocityY()+"\nTime: "+time);
+        //this.setAccelerationY(this.netForceY/this.mass);a
         this.setVelocityY(this.getVelocityY()+(this.accelerationY*time));
         this.entity.setY(this.entity.getY()+this.velocityY*time);
         //this.ResetForcesY();
@@ -98,5 +98,97 @@ public class Physics {
             this.entity.physics.setAccelerationY(-this.entity.physics.getAccelerationY());
             this.entity.physics.setVelocityY(0);
         }
+    }
+    public void EntityCollision(Entity collider){
+        boolean left = false;
+        boolean right = false;
+        boolean top = false;
+        boolean bottom = false;
+        boolean collision = false;
+        if(this.entity.getLeftSide() < collider.getRightSide() && this.entity.getLeftSide() > collider.getLeftSide())
+        {left = true;}
+        if(this.entity.getRightSide() < collider.getRightSide() && this.entity.getRightSide() > collider.getLeftSide())
+        {right = true;}
+        if(this.entity.getTop() < collider.getBottom() && this.entity.getTop() > collider.getTop())
+        {top = true;}
+        if(this.entity.getBottom() < collider.getBottom() && this.entity.getBottom() > collider.getTop())
+        {bottom = true;}
+        //System.out.println("Left:"+left+" Right:"+right+" Top:"+top+"Bottom:"+bottom);
+        if(left || right){
+            if(top || bottom){
+                System.out.println("Collision occured between "+this.entity.name+" and "+collider.name);
+                this.entity.health -= 10;
+                System.out.println("Player heatlh: "+this.entity.health);
+                if(right && top && bottom)
+                {
+                    System.out.println("Player collided on right side.");
+                    this.entity.setX(collider.getX()-this.entity.width);
+                    this.setAccelerationX(0);
+                    this.setVelocityX(-this.getVelocityX());
+                }
+                else if(left && top && bottom)
+                {
+                    System.out.println("Player collided on left side.");
+                    this.entity.setX(collider.getRightSide());
+                    this.setAccelerationX(0);
+                    this.setVelocityX(-this.getVelocityX());
+                }
+                else if(top && right && left)
+                {
+                    
+                    System.out.println("Player collided on top side.");
+                    this.entity.setY(collider.getBottom());
+                    this.setAccelerationY(0);
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                else if(bottom && right && left)
+                {
+                    System.out.println("Player collided on bottom side.");
+                    this.entity.setY(collider.getY()-this.entity.height);
+                    this.setAccelerationY(0);
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                else if(bottom && right){
+                    System.out.println("Player collided on bottom-right corner.");
+                    this.entity.setY(collider.getY()-this.entity.height);
+                    this.entity.setX(collider.getX()-this.entity.width);
+                    this.setAccelerationX(0);
+                    this.setAccelerationY(0);
+                    this.setVelocityX(-this.getVelocityX());
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                
+                else if(top && right){
+                    System.out.println("Player collided on top-right corner.");
+                    this.entity.setY(collider.getBottom());
+                    this.entity.setX(collider.getLeftSide()-this.entity.width);
+                    this.setAccelerationX(0);
+                    this.setAccelerationY(0);
+                    this.setVelocityX(-this.getVelocityX());
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                else if(bottom && left){
+                    System.out.println("Player collided on bottom-left corner.");
+                    this.entity.setY(collider.getY()-this.entity.height);
+                    this.entity.setX(collider.getRightSide());
+                    this.setAccelerationX(0);
+                    this.setAccelerationY(0);
+                    this.setVelocityX(-this.getVelocityX());
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                else if(top && left){
+                    System.out.println("Player collided on top-left corner.");
+                    this.entity.setY(collider.getBottom());
+                    this.entity.setX(collider.getRightSide());
+                    this.setAccelerationX(0);
+                    this.setAccelerationY(0);
+                    this.setVelocityX(-this.getVelocityX());
+                    this.setVelocityY(-this.getVelocityY());
+                }
+                //this.setAccelerationX(0);
+                //this.setVelocityX(-this.getVelocityX());
+            }
+        }
+        else{}      
     }
 }

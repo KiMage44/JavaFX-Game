@@ -37,7 +37,7 @@ public class Level {
         this.gamewidth = gamewidth;
         this.gameheight = gameheight;
         createEntity(0, 0, screenwidth, screenheight, "Camera");
-        createEntity(30, (int) (this.camera.getY()+(this.camera.height/2)), 50, 50, "Player"); 
+        createEntity(30, (int) (this.camera.getY()+(this.camera.height/2)), 25, 25, "Player"); 
     }
     
     public void createEntity(int x, int y, int width, int height, String name) throws FileNotFoundException{
@@ -54,7 +54,11 @@ public class Level {
             this.entityList.add(newEntity);
             System.out.println("New Entity created");
         }
-        
+    }
+    public void createEntity(int x, int y, int width, int height, String name, double xAcc, double yAcc) throws FileNotFoundException{
+        Entity newEntity = new Entity(x,y,width,height,name, xAcc, yAcc);
+        this.entityList.add(newEntity);
+        System.out.println("New Entity created");
     }
     public void display() throws FileNotFoundException{
         Image backg = new Image(new FileInputStream("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Game.png"));
@@ -66,8 +70,8 @@ public class Level {
         for(int i = 0; i< entityList.size(); i++){
             world.getChildren().add(entityList.get(i).getVisual());
         }
+        world.getChildren().add(this.camera.player.entityVisual);
         camera.pane.getChildren().add(world);
-        camera.pane.getChildren().add(this.camera.player.entityVisual);
         
         Scene scene = new Scene(camera.pane,this.screenwidth,this.screenheight);
         scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(this.camera, this.camera.name));
@@ -100,6 +104,7 @@ public class Level {
                 updateLocations(elapsedTimeSeconds);
                 wallCollisions();
                 updateVisuals();
+                EntityCollision();
                 lastTime = currentTime;
             }
         };
@@ -117,6 +122,12 @@ public class Level {
         }
         this.camera.CamerawallCollisions(this.gamewidth, this.gameheight);
         this.camera.player.physics.wallCollisions(this.gamewidth, this.gameheight);
+    }
+    private void EntityCollision(){
+        for(int i = 0; i< entityList.size(); i++){
+            Entity currentEntity = entityList.get(i);
+            this.camera.player.physics.EntityCollision(currentEntity);
+        }
     }
     private void updateVisuals(){
         for(int i = 0; i< entityList.size(); i++){
