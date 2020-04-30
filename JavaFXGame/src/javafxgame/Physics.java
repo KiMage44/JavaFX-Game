@@ -99,12 +99,16 @@ public class Physics {
             this.entity.physics.setVelocityY(0);
         }
     }
-    public void EntityCollision(Entity collider){
+    public int EntityCollision(Entity collider){
         boolean left = false;
         boolean right = false;
         boolean top = false;
         boolean bottom = false;
         boolean collision = false;
+        boolean finishline = false;
+        String collisionSide = "none";
+        if(collider.name == "FinishLine")
+            finishline = true;
         if(this.entity.getLeftSide() < collider.getRightSide() && this.entity.getLeftSide() > collider.getLeftSide())
         {left = true;}
         if(this.entity.getRightSide() < collider.getRightSide() && this.entity.getRightSide() > collider.getLeftSide())
@@ -114,6 +118,7 @@ public class Physics {
         if(this.entity.getBottom() < collider.getBottom() && this.entity.getBottom() > collider.getTop())
         {bottom = true;}
         //System.out.println("Left:"+left+" Right:"+right+" Top:"+top+"Bottom:"+bottom);
+
         if(left || right){
             if(top || bottom){
                 System.out.println("Collision occured between "+this.entity.name+" and "+collider.name);
@@ -122,73 +127,99 @@ public class Physics {
                 if(right && top && bottom)
                 {
                     System.out.println("Player collided on right side.");
-                    this.entity.setX(collider.getX()-this.entity.width);
-                    this.setAccelerationX(0);
-                    this.setVelocityX(-this.getVelocityX());
+                    collisionSide = "right";
+                        
                 }
                 else if(left && top && bottom)
                 {
                     System.out.println("Player collided on left side.");
-                    this.entity.setX(collider.getRightSide());
-                    this.setAccelerationX(0);
-                    this.setVelocityX(-this.getVelocityX());
+                    collisionSide = "left";
                 }
                 else if(top && right && left)
                 {
-                    
                     System.out.println("Player collided on top side.");
-                    this.entity.setY(collider.getBottom());
-                    this.setAccelerationY(0);
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "top";
                 }
                 else if(bottom && right && left)
                 {
                     System.out.println("Player collided on bottom side.");
-                    this.entity.setY(collider.getY()-this.entity.height);
-                    this.setAccelerationY(0);
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "bottom";
+                    
                 }
                 else if(bottom && right){
                     System.out.println("Player collided on bottom-right corner.");
-                    this.entity.setY(collider.getY()-this.entity.height);
-                    this.entity.setX(collider.getX()-this.entity.width);
-                    this.setAccelerationX(0);
-                    this.setAccelerationY(0);
-                    this.setVelocityX(-this.getVelocityX());
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "bottom-right";
                 }
                 
                 else if(top && right){
                     System.out.println("Player collided on top-right corner.");
-                    this.entity.setY(collider.getBottom());
-                    this.entity.setX(collider.getLeftSide()-this.entity.width);
-                    this.setAccelerationX(0);
-                    this.setAccelerationY(0);
-                    this.setVelocityX(-this.getVelocityX());
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "top-right"; 
                 }
                 else if(bottom && left){
                     System.out.println("Player collided on bottom-left corner.");
-                    this.entity.setY(collider.getY()-this.entity.height);
-                    this.entity.setX(collider.getRightSide());
-                    this.setAccelerationX(0);
-                    this.setAccelerationY(0);
-                    this.setVelocityX(-this.getVelocityX());
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "bottom-left";
+                    
                 }
                 else if(top && left){
                     System.out.println("Player collided on top-left corner.");
-                    this.entity.setY(collider.getBottom());
-                    this.entity.setX(collider.getRightSide());
-                    this.setAccelerationX(0);
-                    this.setAccelerationY(0);
-                    this.setVelocityX(-this.getVelocityX());
-                    this.setVelocityY(-this.getVelocityY());
+                    collisionSide = "top-left";
                 }
                 //this.setAccelerationX(0);
                 //this.setVelocityX(-this.getVelocityX());
             }
         }
-        else{}      
+        if(collisionSide != "none"){
+            if(finishline)
+                return 1;
+            else{
+                switch(collisionSide){
+                    case "right":
+                        this.entity.setX(collider.getX()-this.entity.width);
+                        this.setAccelerationX(0);
+                        this.setVelocityX(-this.getVelocityX());
+                    case "left":
+                        this.entity.setX(collider.getRightSide());
+                        this.setAccelerationX(0);
+                        this.setVelocityX(-this.getVelocityX());
+                    case "top":
+                        this.entity.setY(collider.getBottom());
+                        this.setAccelerationY(0);
+                        this.setVelocityY(-this.getVelocityY());
+                    case "bottom":
+                        this.entity.setY(collider.getY()-this.entity.height);
+                        this.setAccelerationY(0);
+                        this.setVelocityY(-this.getVelocityY());
+                    case "bottom-right":
+                        this.entity.setY(collider.getY()-this.entity.height);
+                        this.entity.setX(collider.getX()-this.entity.width);
+                        this.setAccelerationX(0);
+                        this.setAccelerationY(0);
+                        this.setVelocityX(-this.getVelocityX());
+                        this.setVelocityY(-this.getVelocityY());
+                    case "top-right":
+                        this.entity.setY(collider.getBottom());
+                        this.entity.setX(collider.getLeftSide()-this.entity.width);
+                        this.setAccelerationX(0);
+                        this.setAccelerationY(0);
+                        this.setVelocityX(-this.getVelocityX());
+                        this.setVelocityY(-this.getVelocityY());
+                    case "bottom-left":
+                        this.entity.setY(collider.getY()-this.entity.height);
+                        this.entity.setX(collider.getRightSide());
+                        this.setAccelerationX(0);
+                        this.setAccelerationY(0);
+                        this.setVelocityX(-this.getVelocityX());
+                        this.setVelocityY(-this.getVelocityY());
+                    case "top-left":
+                        this.entity.setY(collider.getBottom());
+                        this.entity.setX(collider.getRightSide());
+                        this.setAccelerationX(0);
+                        this.setAccelerationY(0);
+                        this.setVelocityX(-this.getVelocityX());
+                        this.setVelocityY(-this.getVelocityY());
+                }
+            }
+        }
+        return 0;
     }
 }

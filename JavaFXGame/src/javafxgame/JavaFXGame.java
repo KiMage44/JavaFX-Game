@@ -47,10 +47,10 @@ public class JavaFXGame extends Application {
         this.gamewidth = 20000;
         this.gameheight = 1200;
         Level levelOne = new Level(stage, screenwidth, screenheight, gamewidth, gameheight);
-        levelOne.createEntity(5000, 400, 100, 50, "Object",0,-20);
-        levelOne.createEntity(700, 250, 300, 100, "Object",0,-10);
-        levelOne.createEntity(1200, 300, 50, 100, "Object",0,50);
-        levelOne.createEntity(3000, 900, 50, 100, "Object",0,5);
+        //levelOne.createEntity(5000, 400, 100, 50, "Object",0,-20);
+        //levelOne.createEntity(700, 250, 300, 100, "Object",0,-10);
+        //levelOne.createEntity(1200, 300, 50, 100, "Object",0,50);
+        //levelOne.createEntity(3000, 900, 50, 100, "Object",0,5);
         levelOne.createEntity((int) (gamewidth*0.8), 0, 100, gameheight, "FinishLine");
         levelOne.display();
     }

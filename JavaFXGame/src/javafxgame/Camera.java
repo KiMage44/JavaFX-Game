@@ -15,6 +15,7 @@ import javafx.scene.layout.Pane;
 public class Camera extends Entity{
     Player player;
     Pane pane = new Pane();
+    double lowerVelCap = 0;
     Camera(int x, int y, int width, int height, String name, int screenwidth, int screenheight) throws FileNotFoundException{
         super(x, y, width, height, name);
         this.pane.setPrefWidth(screenwidth);
@@ -30,8 +31,6 @@ public class Camera extends Entity{
     @Override
     public void updateLocation(double time){
         this.player.physics.setAccelerationX(this.physics.getAccelerationX());
-   
-        
         this.player.physics.calculateNetX(time);
         this.player.physics.calculateNetY(time);
         PlayerSyncX(time);
@@ -139,6 +138,8 @@ public class Camera extends Entity{
             this.setY(gameheight-this.height);
             this.physics.setVelocityY(0);
         }
-        
+        if(this.player.getX()< this.getX()){
+            this.player.setX(this.getX());
+        }
     }
 }

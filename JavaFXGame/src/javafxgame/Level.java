@@ -103,8 +103,8 @@ public class Level {
                 //System.out.println(elapsedTimeSeconds);
                 updateLocations(elapsedTimeSeconds);
                 wallCollisions();
-                updateVisuals();
                 EntityCollision();
+                updateVisuals();
                 lastTime = currentTime;
             }
         };
@@ -126,7 +126,9 @@ public class Level {
     private void EntityCollision(){
         for(int i = 0; i< entityList.size(); i++){
             Entity currentEntity = entityList.get(i);
-            this.camera.player.physics.EntityCollision(currentEntity);
+            int finished = this.camera.player.physics.EntityCollision(currentEntity);
+            if(finished == 1)
+                EndScreen();
         }
     }
     private void updateVisuals(){
@@ -134,5 +136,8 @@ public class Level {
                 entityList.get(i).updateVisual();
             }
         this.camera.updateVisual();
+    }
+    private void EndScreen(){
+        System.exit(0);
     }
 }
