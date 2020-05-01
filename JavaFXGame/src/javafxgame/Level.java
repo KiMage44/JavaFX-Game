@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -29,8 +31,11 @@ public class Level {
     int screenheight;
     int gamewidth;
     int gameheight;
+    boolean endLevel = false;
+    IntegerProperty screenChange = new SimpleIntegerProperty(0);
     ArrayList<Entity> entityList = new ArrayList<Entity>();
     Level(Stage stage, int screenwidth, int screenheight, int gamewidth, int gameheight) throws FileNotFoundException{
+        this.screenChange = screenChange;
         this.stage = stage;
         this.screenwidth = screenwidth;
         this.screenheight = screenheight;
@@ -61,6 +66,7 @@ public class Level {
         System.out.println("New Entity created");
     }
     public void display() throws FileNotFoundException{
+        
         Image backg = new Image(new FileInputStream("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Game.png"));
         ImageView image = new ImageView(backg);
         image.setFitHeight(this.gameheight);
@@ -72,17 +78,17 @@ public class Level {
         }
         world.getChildren().add(this.camera.player.entityVisual);
         camera.pane.getChildren().add(world);
-        
-        Scene scene = new Scene(camera.pane,this.screenwidth,this.screenheight);
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(this.camera, this.camera.name));
-        scene.addEventHandler(KeyEvent.KEY_RELEASED, new keyHandler(this.camera, this.camera.name));
+        gameLoop(camera.pane);
+    }
+    private void gameLoop(Pane pane){
+        PauseMenu pause = new PauseMenu();
+        Scene scene = new Scene(pane,this.screenwidth,this.screenheight);
+        scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(this.camera, this.camera.name, this.screenChange));
+        scene.addEventHandler(KeyEvent.KEY_RELEASED, new keyHandler(this.camera, this.camera.name, this.screenChange));
         scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(this.camera.player, this.camera.player.name));
         scene.addEventHandler(KeyEvent.KEY_RELEASED, new keyHandler(this.camera.player,this.camera.player.name));
         stage.setScene(scene);
         stage.show();
-        gameLoop();
-    }
-    private void gameLoop(){
         AnimationTimer animation = new AnimationTimer(){
             boolean started = false;
             double firstTime;
@@ -91,21 +97,28 @@ public class Level {
             double elapsedTimeSeconds;
             @Override
             public void handle(long now) {
-                if(!started){
-                    firstTime = System.currentTimeMillis();
-                    lastTime = firstTime;
-                    started = true;
-                    //System.out.println("Program Started: "+firstTime);
+                if(screenChange.get() == 2){
+                    scene.setRoot(pause);
+                    currentTime = System.currentTimeMillis();
                 }
-                currentTime = System.currentTimeMillis();
-                //System.out.println("milis: "+currentTime);
-                elapsedTimeSeconds = ((currentTime-lastTime)/100.0);
-                //System.out.println(elapsedTimeSeconds);
-                updateLocations(elapsedTimeSeconds);
-                wallCollisions();
-                EntityCollision();
-                updateVisuals();
-                lastTime = currentTime;
+                else{
+                    scene.setRoot(pane);
+                    if(!started){
+                        firstTime = System.currentTimeMillis();
+                        lastTime = firstTime;
+                        started = true;
+                        //System.out.println("Program Started: "+firstTime);
+                    }
+                    currentTime = System.currentTimeMillis();
+                    //System.out.println("milis: "+currentTime);
+                    elapsedTimeSeconds = ((currentTime-lastTime)/100.0);
+                    //System.out.println(elapsedTimeSeconds);
+                    updateLocations(elapsedTimeSeconds);
+                    wallCollisions();
+                    EntityCollision();
+                    updateVisuals();
+                    lastTime = currentTime;
+                }
             }
         };
         animation.start();
@@ -128,7 +141,7 @@ public class Level {
             Entity currentEntity = entityList.get(i);
             int finished = this.camera.player.physics.EntityCollision(currentEntity);
             if(finished == 1)
-                EndScreen();
+                endLevel = true;
         }
     }
     private void updateVisuals(){
@@ -136,8 +149,5 @@ public class Level {
                 entityList.get(i).updateVisual();
             }
         this.camera.updateVisual();
-    }
-    private void EndScreen(){
-        System.exit(0);
     }
 }

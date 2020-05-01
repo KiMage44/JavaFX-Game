@@ -7,8 +7,13 @@ package javafxgame;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.logging.Logger;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Rectangle2D;
@@ -32,13 +37,30 @@ public class JavaFXGame extends Application {
     int gameheight;
     int screenwidth;
     int screenheight;
+    int endscreen = 0;
+    private IntegerProperty currentScreen = new SimpleIntegerProperty(0);
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         this.screenwidth = (int) primaryScreenBounds.getWidth();
         this.screenheight = (int) primaryScreenBounds.getHeight();
-        //gameheight-(gameheight/5);
-       levelOne(primaryStage);
+        currentScreen.addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                if(newValue.toString().equals("1"))
+                    try {
+                        levelOne(primaryStage);
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
+                else if(newValue.toString().equals("2"))
+                    System.out.println("Congrats, you've managed to accomplish something.");
+                else
+                    System.out.println(newValue.toString());
+            }
+        });
+        currentScreen.set(1);
+        System.out.println("Ach");
     }
     public static void main(String[] args) {
         launch(args);
@@ -54,5 +76,11 @@ public class JavaFXGame extends Application {
         levelOne.createEntity((int) (gamewidth*0.8), 0, 100, gameheight, "FinishLine");
         levelOne.display();
     }
-    
+    private void Endgame(Stage stage){
+        System.out.println("Potato");
+        EndScreen screen = new EndScreen();
+        Scene scene = new Scene(screen);
+        stage.show();
+        
+    }
 }

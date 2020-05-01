@@ -6,6 +6,9 @@
 package javafxgame;
 
 import java.beans.EventHandler;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -17,12 +20,14 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
     Player player;
     Camera camera;
     String name;
+    IntegerProperty screenChange;
     double value = 2;
     double Vvalue = 20;
     double releasevalue = 0;
-    keyHandler(Camera camera, String name){
+    keyHandler(Camera camera, String name, IntegerProperty screenChange){
         this.camera = camera;
         this.name = name;
+        this.screenChange = screenChange;
     }
     keyHandler(Player player, String name){
         this.player = player;
@@ -36,7 +41,7 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
             else if (this.name == "Player")
                 PlayerKeyPressed(event);
         }
-        else if(event.getEventType().getName() == "KEY_RELEASED"){
+        if(event.getEventType().getName() == "KEY_RELEASED"){
             if(this.name == "Camera")
                 CameraKeyReleased(event);
             else if (this.name == "Player")
@@ -62,6 +67,12 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
         else if(event.getCode() == KeyCode.D || event.getCode() == KeyCode.RIGHT){
             camera.physics.setAccelerationX(-releasevalue);
             //System.out.println("D released");
+        }
+        if(event.getCode() == KeyCode.ESCAPE){
+           if(this.screenChange.get() == 2)
+               this.screenChange.set(1);
+           else
+               this.screenChange.set(2);
         }
     }
     public void PlayerKeyPressed(KeyEvent event){
