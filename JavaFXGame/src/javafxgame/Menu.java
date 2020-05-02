@@ -7,12 +7,11 @@ package javafxgame;
 
 import javafx.scene.layout.Pane;
 
-/**
- *
- * @author tchoa
- */
-public class EndScreen extends Pane{
-    EndScreen(){
-        
+public class Menu extends Pane{
+    Menu(String name, int x, int y, int width, int height){
+        this.setPrefWidth(width);
+        this.setPrefHeight(height);
+        this.setLayoutX(x);
+        this.setLayoutY(y);
     }
 }

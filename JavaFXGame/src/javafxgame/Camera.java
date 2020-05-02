@@ -8,6 +8,7 @@ package javafxgame;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -15,6 +16,7 @@ import javafx.scene.layout.Pane;
 public class Camera extends Entity{
     Player player;
     Pane pane = new Pane();
+    Group GUI = new Group();
     double lowerVelCap = 0;
     Camera(int x, int y, int width, int height, String name, int screenwidth, int screenheight) throws FileNotFoundException{
         super(x, y, width, height, name);
@@ -27,6 +29,15 @@ public class Camera extends Entity{
     @Override
     public void setVisual(String value){
     
+    }
+    public void createGUI(){
+        Label healthLabel = new Label();
+        healthLabel.setText(String.valueOf(this.player.health));
+        healthLabel.textProperty().bindBidirectional(this.player.healthProperty);
+        healthLabel.setLayoutX(0);
+        healthLabel.setLayoutY(0);
+        healthLabel.setPrefSize(20, 20);
+        this.GUI.getChildren().add(healthLabel);
     }
     @Override
     public void updateLocation(double time){
@@ -78,6 +89,7 @@ public class Camera extends Entity{
     @Override
     public void updateVisual(){
         this.pane.relocate(-this.getX(), -this.getY());
+        this.GUI.relocate(this.getX(), this.getY());
         this.player.entityVisual.relocate(this.player.getX(), this.player.getY());
     }
     @Override

@@ -10,6 +10,8 @@ import java.io.FileNotFoundException;
 import java.util.logging.Logger;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -23,7 +25,8 @@ public class Entity {
     double width;
     double height;
     String name;
-    int health = 100;
+    int health;
+    StringProperty healthProperty = new SimpleStringProperty();
     Physics physics = new Physics(this);
     Image image;
     ImageView entityVisual;
@@ -36,6 +39,7 @@ public class Entity {
         this.physics.setAccelerationX(xAcc);
         this.physics.setAccelerationY(yAcc);
         this.setVisual("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Wall.png");
+        this.setHealth(100);
     }
     Entity(int x, int y, int width, int height, String name) throws FileNotFoundException{
         this.x = x;
@@ -44,6 +48,15 @@ public class Entity {
         this.height = height;
         this.name = name;
         this.setVisual("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Wall.png");
+        this.setHealth(100);
+    }
+    public void setHealth(int value){
+        this.health = value;
+        this.healthProperty.set(String.valueOf(this.health));
+        System.out.println("Set health to "+String.valueOf(this.health));
+    }
+    public int getHealth(){
+        return this.health;
     }
     public void setX(double value){
         this.x = value;

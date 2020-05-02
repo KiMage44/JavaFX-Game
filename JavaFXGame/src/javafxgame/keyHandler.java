@@ -69,10 +69,10 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
             //System.out.println("D released");
         }
         if(event.getCode() == KeyCode.ESCAPE){
-           if(this.screenChange.get() == 2)
-               this.screenChange.set(1);
+           if(this.screenChange.get() == 1)
+               this.screenChange.set(4);
            else
-               this.screenChange.set(2);
+               this.screenChange.set(1);
         }
     }
     public void PlayerKeyPressed(KeyEvent event){

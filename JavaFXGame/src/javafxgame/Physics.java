@@ -122,7 +122,7 @@ public class Physics {
         if(left || right){
             if(top || bottom){
                 System.out.println("Collision occured between "+this.entity.name+" and "+collider.name);
-                this.entity.health -= 10;
+                this.entity.setHealth(this.entity.getHealth()-10);
                 System.out.println("Player heatlh: "+this.entity.health);
                 if(right && top && bottom)
                 {
