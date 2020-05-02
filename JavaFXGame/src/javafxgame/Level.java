@@ -33,34 +33,46 @@ public class Level{
     int gamewidth;
     int gameheight;
     ImageView background;
+    boolean completed = false;
     Group world = new Group();
+    String directory;
     ArrayList<Entity> entityList = new ArrayList<Entity>();
-    Level(int gamewidth, int gameheight) throws FileNotFoundException{
+    ArrayList<Enemies> enemyList = new ArrayList<Enemies>();
+    Level(int gamewidth, int gameheight, String directory) throws FileNotFoundException{
+        this.directory = directory;
         this.gamewidth = gamewidth;
         this.gameheight = gameheight;
     }
-    public void createEntity(int x, int y, int width, int height, String name) throws FileNotFoundException{
+    public Entity createEntity(int x, int y, int width, int height, String name) throws FileNotFoundException{
         if(name == "Camera"){
-            this.camera = new Camera(x,y,width,height,name,this.gamewidth, this.gameheight);
+            this.camera = new Camera(x,y,width,height,name,this.gamewidth, this.gameheight, this.directory);
             System.out.println("Camera created");
         }
         else if(name == "Player"){
-            Player newPlayer = new Player(x,y,width,height,name);
+            Player newPlayer = new Player(x,y,width,height,name, this.directory);
             camera.setPlayer(newPlayer);
         }
+        else if(name == "Enemy"){
+            Enemies newEnemy = new Enemies(x,y,width,height,name, this.directory);
+            this.enemyList.add(newEnemy);
+            System.out.println("New Enemy created");
+        }
         else{
-            Entity newEntity = new Entity(x,y,width,height,name);
+            Entity newEntity = new Entity(x,y,width,height,name, this.directory);
             this.entityList.add(newEntity);
             System.out.println("New Entity created");
+            return newEntity;
         }
+        return null;
     }
-    public void createEntity(int x, int y, int width, int height, String name, double xAcc, double yAcc) throws FileNotFoundException{
-        Entity newEntity = new Entity(x,y,width,height,name, xAcc, yAcc);
+    public Entity createEntity(int x, int y, int width, int height, String name, double xAcc, double yAcc) throws FileNotFoundException{
+        Entity newEntity = new Entity(x,y,width,height,name, xAcc, yAcc, this.directory);
         this.entityList.add(newEntity);
         System.out.println("New Entity created");
+        return newEntity;
     }
-    public void setBackground() throws FileNotFoundException{
-        Image image = new Image(new FileInputStream("C:\\Users\\tchoa\\Documents\\GitHub\\JavaFX-Game\\JavaFXGame\\src\\javafxgame\\GameArt\\Game.png"));
+    public void setBackground(String value) throws FileNotFoundException{
+        Image image = new Image(new FileInputStream(this.directory+value));
         this.background = new ImageView(image);
         this.background.setFitHeight(this.gameheight);
         this.background.setFitWidth(this.gamewidth);

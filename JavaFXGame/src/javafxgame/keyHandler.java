@@ -70,7 +70,7 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
         }
         if(event.getCode() == KeyCode.ESCAPE){
            if(this.screenChange.get() == 1)
-               this.screenChange.set(4);
+               this.screenChange.set(2);
            else
                this.screenChange.set(1);
         }

@@ -18,8 +18,8 @@ public class Camera extends Entity{
     Pane pane = new Pane();
     Group GUI = new Group();
     double lowerVelCap = 0;
-    Camera(int x, int y, int width, int height, String name, int screenwidth, int screenheight) throws FileNotFoundException{
-        super(x, y, width, height, name);
+    Camera(int x, int y, int width, int height, String name, int screenwidth, int screenheight, String directory) throws FileNotFoundException{
+        super(x, y, width, height, name, directory);
         this.pane.setPrefWidth(screenwidth);
         this.pane.setPrefHeight(screenheight);
         this.pane.setLayoutX(x);
@@ -30,14 +30,29 @@ public class Camera extends Entity{
     public void setVisual(String value){
     
     }
-    public void createGUI(){
+    public void createGUI(int screenwidth,int screenheight, int score){
         Label healthLabel = new Label();
         healthLabel.setText(String.valueOf(this.player.health));
         healthLabel.textProperty().bindBidirectional(this.player.healthProperty);
         healthLabel.setLayoutX(0);
         healthLabel.setLayoutY(0);
         healthLabel.setPrefSize(20, 20);
+        Label velocityLabel = new Label();
+        velocityLabel.setPrefHeight(30);
+        velocityLabel.setPrefWidth(30);
+        velocityLabel.setLayoutX(screenwidth-velocityLabel.getPrefWidth());
+        velocityLabel.setLayoutY(screenheight-velocityLabel.getPrefHeight());
+        velocityLabel.setText("0");
+        velocityLabel.textProperty().bindBidirectional(this.player.physics.xvel);
+        Label scoreLabel = new Label();
+        scoreLabel.setPrefHeight(30);
+        scoreLabel.setPrefWidth(100);
+        scoreLabel.setLayoutX(0+velocityLabel.getPrefWidth());
+        scoreLabel.setLayoutY(screenheight-velocityLabel.getPrefHeight());
+        scoreLabel.setText("Score: "+String.valueOf(score));
         this.GUI.getChildren().add(healthLabel);
+        this.GUI.getChildren().add(velocityLabel);
+        this.GUI.getChildren().add(scoreLabel);
     }
     @Override
     public void updateLocation(double time){

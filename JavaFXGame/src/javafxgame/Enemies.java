@@ -13,8 +13,8 @@ import java.io.FileNotFoundException;
  */
 public class Enemies extends Entity{
     
-    public Enemies(int x, int y, int width, int height, String name) throws FileNotFoundException {
-        super(x, y, width, height, name);
+    public Enemies(int x, int y, int width, int height, String name, String directory) throws FileNotFoundException {
+        super(x, y, width, height, name, directory);
         
     }
     private void findPlayer(){
