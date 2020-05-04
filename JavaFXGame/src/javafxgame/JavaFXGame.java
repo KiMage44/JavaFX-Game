@@ -72,24 +72,20 @@ public class JavaFXGame extends Application {
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         this.screenwidth = (int) primaryScreenBounds.getWidth();
         this.screenheight = (int) primaryScreenBounds.getHeight();
-        
-        createMainMenu();
-        createPauseMenu();
-        createEndScreen();
         this.currentPane.set(0);
-        this.scene = new Scene(getScreen(null),screenwidth,screenheight);
+        this.scene = new Scene(createMainMenu(),screenwidth,screenheight);
         firstLoop();
         
     }
     public static void main(String[] args) {
         launch(args);
     }
-    private void firstLoop(){
-        this.currentPane.set(0);
+    private void firstLoop() throws FileNotFoundException{
+        System.out.println(this.scene.getRoot());
+        this.scene.setRoot(createMainMenu());
         this.currentPane.addListener(new ChangeListener() {
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                System.out.println("POGGERS");
                 if(newValue.toString().equals("1")){
                     difficulty = 1;
                     currentPane.removeListener(this);
@@ -113,7 +109,7 @@ public class JavaFXGame extends Application {
         stage.show();
     }
     //Generates the Main Menu shown at the start of the game
-    private void createMainMenu() throws FileNotFoundException{
+    private Pane createMainMenu() throws FileNotFoundException{
         Menu main = new Menu("Main",0,0,this.screenwidth,this.screenheight);
         
         HBox buttonBox = new HBox();
@@ -149,11 +145,24 @@ public class JavaFXGame extends Application {
         buttonBox.getChildren().add(button3);
         
         main.getChildren().add(buttonBox);
-        menus.add(main);
+        return main;
     }
     //Generates the Pause screen shown when a player pauses the game
-    private void createPauseMenu() throws FileNotFoundException{
+    private Pane createPauseMenu(Level currentLevel) throws FileNotFoundException{
         Menu pause = new Menu("Pause",0,0,this.screenwidth,this.screenheight);
+        ImageView returnGame = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\ReturnToGame.png")));
+        returnGame.setFitHeight(100);
+        returnGame.setFitWidth(300);
+        returnGame.setLayoutX((screenwidth/2)-(returnGame.getFitWidth()/2));
+        returnGame.setLayoutY((screenheight*0.4));
+        returnGame.setOnMouseClicked(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                
+                scene.setRoot(currentLevel.getPane());
+                currentPane.set(1);
+            }
+        });
         ImageView exitGame = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\ExitGame.png")));
         exitGame.setFitHeight(100);
         exitGame.setFitWidth(300);
@@ -174,18 +183,23 @@ public class JavaFXGame extends Application {
             @Override
             public void handle(Event event) {
                 currentPane.set(0);
-                firstLoop();
+                try {
+                    firstLoop();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
             }
         });
         
         pause.getChildren().add(exitGame);
         pause.getChildren().add(exitMenu);
-        menus.add(pause);
+        pause.getChildren().add(returnGame);
+        return pause;
     }
     //Generates the End screen shown when a level is completed
-    private void createEndScreen(){
+    private Pane createEndScreen(){
         Menu end = new Menu("End",0,0,this.screenwidth,this.screenheight);
-        menus.add(end);
+        return end;
     }
     //Creates the first level, then adds it to the global list
     private Level levelOne() throws FileNotFoundException{
@@ -235,19 +249,19 @@ public class JavaFXGame extends Application {
     
     //When called, returns the currentPane that is to be displayed. Lets me easily switch between the pause screen and the normal game, and allows the 
     //option to switch in-between levels if desired
-    private Pane getScreen(Level currentLevel){
+    /*private Pane getScreen(Level currentLevel) throws FileNotFoundException{
         switch(currentPane.get()){
             case 0:
-                return menus.get(0);
+                return createMainMenu();
             case 1:
                 return currentLevel.getPane();
             case 2:
-                return menus.get(1);
+                return createPauseMenu();
             case 3:
-                return menus.get(2);
+                return createEndScreen();
         }
         return null;
-    }
+    }*/
     private void generateEnemies(Level level) throws FileNotFoundException{
         Random rand = new Random();
         Entity rotated;
@@ -334,42 +348,31 @@ public class JavaFXGame extends Application {
                 //System.out.println(currentPane);
                 if(newValue.toString().equals("0")){
                     animation.stop();
-                    scene.setRoot(getScreen(currentLevel));
+                    currentPane.removeListener(this);
                 }
                 if(newValue.toString().equals("1")){
+                    System.out.println("Start back up game");
                     started = false;
                     animation.start();
-                    scene.setRoot(getScreen(currentLevel));
                 }
                 if(newValue.toString().equals("2")){
                     animation.stop();
                     System.out.println("Stopped");
-                    scene.setRoot(menus.get(1));
-                    System.out.println(scene.getRoot());
+                    try {
+                        scene.setRoot(createPauseMenu(currentLevel));
+                    } catch (FileNotFoundException ex) {
+                        Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                    }
                 }
                 if(newValue.toString().equals("3")){
+                    currentPane.removeListener(this);
                     animation.stop();
-                    buildEndscreen(failed);
                 }
             }
         });
         animation.start();
     }
     //Builds the screen for end-scenarios
-    private void buildEndscreen(boolean failed){
-        Label result;
-        if(failed){
-            result = new Label("Failed");
-        }
-        else{
-            result = new Label("Success");
-        }
-        result.setLayoutX(gamewidth/2);
-        result.setLayoutY(gameheight/2);
-        Pane endpane = getScreen(null);
-        endpane.getChildren().add(result);
-        scene.setRoot(endpane);
-    }
     //Updates the locations of all elements currently in the level.
     private void updateLocations(Level currentLevel, double time){
         for(int i = 0; i< currentLevel.entityList.size(); i++){
