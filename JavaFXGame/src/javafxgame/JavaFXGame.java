@@ -25,6 +25,8 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -37,71 +39,78 @@ import javafx.stage.Stage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.media.AudioClip;
+import javafx.scene.paint.Color;
+
+/* To Do:
+    Get images for all entities
+    create a frame cycle for entity animations
+    Background music
+    Rework Collisions
+    Fix Obstacle Generation
+    Make Enemies shoot bullets
+*/
 public class JavaFXGame extends Application {
-    int gamewidth;
-    int gameheight;
+    Stage stage;
+    Scene scene;
     int screenwidth;
     int screenheight;
+    int gamewidth;
+    int gameheight;
     String directory = System.getProperty("user.dir");
-    IntegerProperty currentPane = new SimpleIntegerProperty(); // Main Menu = 0, currentLevel = 1, Pause = 2, Endscreen = 3
-    ArrayList<Menu> menus = new ArrayList<Menu>();
-    ArrayList<Level> levels = new ArrayList<Level>();
+    
     boolean started;
     boolean failed;
     int score;
     int difficulty = 3;
-    Scene scene;
-    Stage stage;
+    
+    IntegerProperty currentPane = new SimpleIntegerProperty(); // Main Menu = 0, currentLevel = 1, Pause = 2, Endscreen = 3
+    ArrayList<Menu> menus = new ArrayList<Menu>();
+    
     @Override
     public void start(Stage primaryStage) throws FileNotFoundException {
-        System.out.println(directory);
         this.stage = primaryStage;
         Rectangle2D primaryScreenBounds = Screen.getPrimary().getVisualBounds();
         this.screenwidth = (int) primaryScreenBounds.getWidth();
         this.screenheight = (int) primaryScreenBounds.getHeight();
+        
         createMainMenu();
         createPauseMenu();
         createEndScreen();
-        levelOne();
-        levelTwo();
-        levelThree();
         this.currentPane.set(0);
         this.scene = new Scene(getScreen(null),screenwidth,screenheight);
-        currentPane.addListener(new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                //System.out.println(currentPane);
-                if(newValue.toString().equals("1")){
-                    try {
-                        gameLoop(levels.get(0));
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                    }
-                    currentPane.removeListener(this);
-                }
-                if(newValue.toString().equals("2")){
-                    try {
-                        gameLoop(levels.get(1));
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                    }
-                    currentPane.removeListener(this);
-                }
-                if(newValue.toString().equals("3")){
-                    try {
-                        gameLoop(levels.get(2));
-                    } catch (FileNotFoundException ex) {
-                        Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-                    }
-                    currentPane.removeListener(this);
-                }
-            }
-        });
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        firstLoop();
+        
     }
     public static void main(String[] args) {
         launch(args);
+    }
+    private void firstLoop(){
+        this.currentPane.set(0);
+        this.currentPane.addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+                System.out.println("POGGERS");
+                if(newValue.toString().equals("1")){
+                    difficulty = 1;
+                    currentPane.removeListener(this);
+                }
+                if(newValue.toString().equals("2")){
+                    difficulty = 2;
+                    currentPane.removeListener(this);
+                }
+                if(newValue.toString().equals("3")){
+                    difficulty = 3;
+                    currentPane.removeListener(this);
+                }
+                try {
+                    gameLoop(levelOne());
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(JavaFXGame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                }
+            }
+        });
+        stage.setScene(scene);
+        stage.show();
     }
     //Generates the Main Menu shown at the start of the game
     private void createMainMenu() throws FileNotFoundException{
@@ -120,8 +129,7 @@ public class JavaFXGame extends Application {
             @Override
             public void handle(Event event) {
                 currentPane.set(1);
-            }
-        });
+            }});
         buttonBox.getChildren().add(button1);
         
         ImageView button2 = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\Level2.png")));
@@ -129,8 +137,7 @@ public class JavaFXGame extends Application {
             @Override
             public void handle(Event event) {
                 currentPane.set(2);
-            }
-        });
+            }});
         buttonBox.getChildren().add(button2);
         
         ImageView button3 = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\Level3.png")));
@@ -138,16 +145,41 @@ public class JavaFXGame extends Application {
             @Override
             public void handle(Event event) {
                 currentPane.set(3);
-            }
-        });
+            }});
         buttonBox.getChildren().add(button3);
         
         main.getChildren().add(buttonBox);
         menus.add(main);
     }
     //Generates the Pause screen shown when a player pauses the game
-    private void createPauseMenu(){
+    private void createPauseMenu() throws FileNotFoundException{
         Menu pause = new Menu("Pause",0,0,this.screenwidth,this.screenheight);
+        ImageView exitGame = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\ExitGame.png")));
+        exitGame.setFitHeight(100);
+        exitGame.setFitWidth(300);
+        exitGame.setLayoutX((screenwidth/2)-(exitGame.getFitWidth()/2));
+        exitGame.setLayoutY((screenheight*0.8));
+        exitGame.setOnMouseClicked(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                System.exit(0);
+            }
+        });
+        ImageView exitMenu = new ImageView(new Image(new FileInputStream(this.directory+"\\src\\javafxgame\\GameArt\\ExitMenu.png")));
+        exitMenu.setFitHeight(100);
+        exitMenu.setFitWidth(300);
+        exitMenu.setLayoutX((screenwidth/2)-(exitMenu.getFitWidth()/2));
+        exitMenu.setLayoutY((screenheight*0.6));
+        exitMenu.setOnMouseClicked(new EventHandler() {
+            @Override
+            public void handle(Event event) {
+                currentPane.set(0);
+                firstLoop();
+            }
+        });
+        
+        pause.getChildren().add(exitGame);
+        pause.getChildren().add(exitMenu);
         menus.add(pause);
     }
     //Generates the End screen shown when a level is completed
@@ -156,19 +188,27 @@ public class JavaFXGame extends Application {
         menus.add(end);
     }
     //Creates the first level, then adds it to the global list
-    private void levelOne() throws FileNotFoundException{
+    private Level levelOne() throws FileNotFoundException{
         this.gamewidth = 20000;
         this.gameheight = 1200;
         Level levelOne = new Level(gamewidth, gameheight, this.directory);
-        levelOne.setBackground("\\src\\javafxgame\\GameArt\\Background.png");
+        String backgroundPath = null;
+        if(difficulty == 1)
+            backgroundPath = "\\src\\javafxgame\\GameArt\\Background.png";
+        else if(difficulty == 2)
+            backgroundPath = "\\src\\javafxgame\\GameArt\\Background2.png";
+        else if(difficulty == 3)
+            backgroundPath = "\\src\\javafxgame\\GameArt\\Background.png";
+        levelOne.setBackground(backgroundPath);
         levelOne.createEntity(0, 0, 1920, 1080 , "Camera");
         levelOne.createEntity(30, (int) (levelOne.camera.getY()+(levelOne.camera.height/2)), 25, 25, "Player"); 
         levelOne.camera.createGUI(screenwidth,screenheight,score);
         generateEnemies(levelOne);
+        levelOne.createEntity(500, 700, 100, 100, "Enemy");
         levelOne.buildVisuals();
-        levels.add(levelOne);
+        return levelOne;
     }
-    //Creates the second level, then adds it to the global list
+    /*Creates the second level, then adds it to the global list
     private void levelTwo() throws FileNotFoundException{
         this.gamewidth = 20000;
         this.gameheight = 1200;
@@ -191,7 +231,8 @@ public class JavaFXGame extends Application {
         levelThree.camera.createGUI(screenwidth,screenheight, score);
         levelThree.buildVisuals();
         levels.add(levelThree);
-    }
+    }*/
+    
     //When called, returns the currentPane that is to be displayed. Lets me easily switch between the pause screen and the normal game, and allows the 
     //option to switch in-between levels if desired
     private Pane getScreen(Level currentLevel){
@@ -210,70 +251,41 @@ public class JavaFXGame extends Application {
     private void generateEnemies(Level level) throws FileNotFoundException{
         Random rand = new Random();
         Entity rotated;
-        if(difficulty == 1){
-            for(int i = 0; i < 20; i++){
-                int x = rand.nextInt(gamewidth-(gamewidth/10))+((gamewidth/10)-100);
-                int y = rand.nextInt(gameheight-(gameheight/10))+((gameheight/10)-100);
-                int width = rand.nextInt(300)+50;
-                int height = rand.nextInt(150)+50;
+        int enemyCount = 30;
+        int distBetwEntity = 700;
+        for(int i = 0; i < 20; i++){
+            int x = rand.nextInt(distBetwEntity*(i+1))+(distBetwEntity*i);
+            int y = rand.nextInt(gameheight-(gameheight/10))+((gameheight/10)-100);
+            int width = rand.nextInt(100)+50;
+            int height = rand.nextInt(100)+50;
+            int yVel = rand.nextInt(90)+10;
+            int enemyType = rand.nextInt(10);
+            if(difficulty == 1)
                 level.createEntity(x, y, width, height,"Barricade");
-            }
-        }
-        else if(difficulty == 2){
-            for(int i = 0; i < 30; i++){
-                int x = rand.nextInt(gamewidth-(gamewidth/10))+((gamewidth/10)-100);
-                int y = rand.nextInt(gameheight-(gameheight/10))+((gameheight/10)-100);
-                int width = rand.nextInt(300)+50;
-                int height = rand.nextInt(150)+50;
-                int yVel = rand.nextInt(90)+10;
-                int enemyType = rand.nextInt(3);
-                
-                if(enemyType == 2){
-                    level.createEntity(x, y, width, height, directory, 0, yVel);
-                }
-                else{
+            else if(difficulty == 2){
+                if(enemyType == 2)
+                    level.createEntity(x, y, width, height, "Moving_Barricade", 0, yVel);
+                else
                     level.createEntity(x, y, width, height,"Barricade");
-                }
             }
-        }
-        else if(difficulty == 3){
-            for(int i = 0; i < 30; i++){
-                int x = rand.nextInt(gamewidth-(gamewidth/10))+((gamewidth/10)-100);
-                int y = rand.nextInt(gameheight-(gameheight/10))+((gameheight/10)-100);
-                int width = rand.nextInt(300)+50;
-                int height = rand.nextInt(150)+50;
-                int yVel = rand.nextInt(90)+10;
-                int enemyType = rand.nextInt(10);
-                int rotate = rand.nextInt(8);
-                if(enemyType%2 == 0){
-                    if(rotate == 5){
-                        rotated = level.createEntity(x, y, width, height, "Moving_Barricade", 0, yVel);
-                        rotated.entityVisual.setRotate(rand.nextInt(360));
-                    }
-                    else
-                        level.createEntity(x, y, width, height, "Moving_Barricade", 0, yVel);
-
-                }
-                else if(enemyType == 1 || enemyType == 3){
-                    if(rotate == 5){
-                        rotated = level.createEntity(x, y, width, height,"Barricade");
-                        rotated.entityVisual.setRotate(rand.nextInt(360));
-                    }
-                    else
-                        level.createEntity(x, y, width, height,"Barricade");  
-                }
-                else{
+            else if(difficulty == 3){
+                if(enemyType == 0)
+                    level.createEntity(x, y, width, height, "Moving_Barricade", 0, yVel);
+                else if(enemyType == 1)
+                    level.createEntity(x, y, width, height,"Barricade");
+                else
                     level.createEntity(x,y,width,height,"Enemy");
-                }
             }
         }
     }
     //The standard gameloop
     private void gameLoop(Level level) throws FileNotFoundException{
+        //fail/start states
         started = false;
         failed = false;
         Level currentLevel = level;
         scene.setRoot(currentLevel.getPane());
+        //Adds eventhandlers for independent camera/player movement
         scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(currentLevel.camera, currentLevel.camera.name, this.currentPane));
         scene.addEventHandler(KeyEvent.KEY_RELEASED, new keyHandler(currentLevel.camera, currentLevel.camera.name, this.currentPane));
         scene.addEventHandler(KeyEvent.KEY_PRESSED, new keyHandler(currentLevel.camera.player, currentLevel.camera.player.name));
@@ -288,6 +300,7 @@ public class JavaFXGame extends Application {
             double elapsedTimeSeconds;
            
             @Override
+            //the actual gameloop
             public void handle(long now){
                 if(currentLevel.camera.getHealth() <= 0){
                     failed = true;
@@ -310,11 +323,12 @@ public class JavaFXGame extends Application {
                 updateLocations(currentLevel, elapsedTimeSeconds);
                 wallCollisions(currentLevel);
                 EntityCollision(currentLevel);
+                updateAI(currentLevel);
                 updateVisuals(currentLevel);
                 lastTime = currentTime;
             }
         };
-        currentPane.addListener(new ChangeListener() {
+        currentPane.addListener(new ChangeListener() {                          //Changes pane for pause/fail states, and effectively halts gametime
             @Override
             public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                 //System.out.println(currentPane);
@@ -330,7 +344,8 @@ public class JavaFXGame extends Application {
                 if(newValue.toString().equals("2")){
                     animation.stop();
                     System.out.println("Stopped");
-                    scene.setRoot(getScreen(currentLevel));
+                    scene.setRoot(menus.get(1));
+                    System.out.println(scene.getRoot());
                 }
                 if(newValue.toString().equals("3")){
                     animation.stop();
@@ -340,6 +355,7 @@ public class JavaFXGame extends Application {
         });
         animation.start();
     }
+    //Builds the screen for end-scenarios
     private void buildEndscreen(boolean failed){
         Label result;
         if(failed){
@@ -392,5 +408,10 @@ public class JavaFXGame extends Application {
                 currentLevel.entityList.get(i).updateVisual();
             }
         currentLevel.camera.updateVisual();
+    }
+    private void updateAI(Level currentLevel){
+        for(int i = 0; i<currentLevel.enemyList.size(); i++){
+            currentLevel.enemyList.get(i).findPlayer(currentLevel.camera.player);
+        }
     }
 }

@@ -43,34 +43,38 @@ public class Level{
         this.gamewidth = gamewidth;
         this.gameheight = gameheight;
     }
+    //Responsible for creating static entities, or entities with independent movement.
     public Entity createEntity(int x, int y, int width, int height, String name) throws FileNotFoundException{
         if(name == "Camera"){
             this.camera = new Camera(x,y,width,height,name,this.gamewidth, this.gameheight, this.directory);
-            System.out.println("Camera created");
+            System.out.println("Camera created at "+x+" "+y);
         }
-        else if(name == "Player"){
+        else if(name.equals("Player")){
             Player newPlayer = new Player(x,y,width,height,name, this.directory);
             camera.setPlayer(newPlayer);
         }
-        else if(name == "Enemy"){
+        else if(name.equals("Enemy")){
             Enemies newEnemy = new Enemies(x,y,width,height,name, this.directory);
             this.enemyList.add(newEnemy);
-            System.out.println("New Enemy created");
+            this.entityList.add(newEnemy);
+            return newEnemy;
         }
         else{
             Entity newEntity = new Entity(x,y,width,height,name, this.directory);
             this.entityList.add(newEntity);
-            System.out.println("New Entity created");
+            System.out.println("New Entity created at "+x+" "+y);
             return newEntity;
         }
         return null;
     }
+    //Responsible for creating entities that have a predefined static movememnt 
     public Entity createEntity(int x, int y, int width, int height, String name, double xAcc, double yAcc) throws FileNotFoundException{
         Entity newEntity = new Entity(x,y,width,height,name, xAcc, yAcc, this.directory);
         this.entityList.add(newEntity);
-        System.out.println("New Entity created");
+        System.out.println("New Entity created at "+x+" "+y);
         return newEntity;
     }
+    //takes input and changes the level's background image
     public void setBackground(String value) throws FileNotFoundException{
         Image image = new Image(new FileInputStream(this.directory+value));
         this.background = new ImageView(image);
@@ -78,6 +82,7 @@ public class Level{
         this.background.setFitWidth(this.gamewidth);
         world.getChildren().add(this.background);
     }
+    //compiles all entities existing in the level into the camera's pane, then returns the pane to the caller
     public Pane buildVisuals() throws FileNotFoundException{
         System.out.println(entityList.size());
         for(int i = 0; i< entityList.size(); i++){
