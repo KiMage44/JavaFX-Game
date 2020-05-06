@@ -22,7 +22,7 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
     String name;
     IntegerProperty screenChange;
     double value = 2;
-    double Vvalue = 20;
+    double Vvalue = 40;
     double releasevalue = 0;
     keyHandler(Camera camera, String name, IntegerProperty screenChange){
         this.camera = camera;
@@ -49,7 +49,6 @@ class keyHandler extends Thread implements javafx.event.EventHandler<KeyEvent>{
         }
     }
     public void CameraKeyPressed(KeyEvent event){
-        
         if(event.getCode() == KeyCode.A || event.getCode() == KeyCode.LEFT){
             camera.physics.setAccelerationX(-value);
            // System.out.println("A pressed");

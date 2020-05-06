@@ -11,7 +11,11 @@ import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 
 public class Camera extends Entity{
     Player player;
@@ -19,7 +23,7 @@ public class Camera extends Entity{
     Group GUI = new Group();
     double lowerVelCap = 0;
     Camera(int x, int y, int width, int height, String name, int screenwidth, int screenheight, String directory) throws FileNotFoundException{
-        super(x, y, width, height, name, directory);
+        super(x, y, width, height, name);
         this.pane.setPrefWidth(screenwidth);
         this.pane.setPrefHeight(screenheight);
         this.pane.setLayoutX(x);
@@ -30,29 +34,88 @@ public class Camera extends Entity{
     public void setVisual(String value){
     
     }
-    public void createGUI(int screenwidth,int screenheight, int score){
+    //The visual data for the player displayed on the screen.
+    public void createGUI(int screenwidth,int screenheight, int score) throws FileNotFoundException{
+        HBox bulletBox = new HBox();
+        bulletBox.setPrefWidth(300);
+        bulletBox.setPrefHeight(screenheight*0.1);
+        bulletBox.setLayoutX(0);
+        bulletBox.setLayoutY(screenheight*0.9);
+        ImageView gunIcon = new ImageView(new Image(new FileInputStream(this.directory+"\\GameArt\\gun.png")));
+        gunIcon.setFitHeight(100);
+        gunIcon.setFitWidth(100);
+        bulletBox.getChildren().add(gunIcon);
+        Label bullets = new Label();
+        bullets.setFont(new Font("CASTELLAR",30));
+        bullets.setTextFill(Color.RED);
+        bullets.setPrefSize(100, 100);
+        bullets.textProperty().bindBidirectional(this.player.bullets);
+        bulletBox.getChildren().add(bullets);
+        
+        HBox scoreBox = new HBox();
+        scoreBox.setMaxWidth(100);
+        scoreBox.setMaxHeight(30);
+        scoreBox.setMinWidth(100);
+        scoreBox.setMinHeight(30);
+        scoreBox.setLayoutX(screenwidth*0.9);
+        scoreBox.setLayoutY(0);
+        for(int i = 0; i<score; i++){
+            ImageView star = new ImageView(new Image(new FileInputStream(this.directory+"\\GameArt\\ScoreStar.png")));
+            star.setFitHeight(50);
+            star.setFitWidth(50);
+            scoreBox.getChildren().add(star);
+        }
+        HBox healthBox = new HBox();
+        healthBox.setLayoutX(0);
+        healthBox.setLayoutY(0);
+        healthBox.setPrefSize(300, 50);
+        Label health = new Label();
+        health.setText("Health: ");
+        health.setTextFill(Color.WHITE);
+        health.setFont(new Font("CASTELLAR",30));
         Label healthLabel = new Label();
         healthLabel.setText(String.valueOf(this.player.health));
         healthLabel.textProperty().bindBidirectional(this.player.healthProperty);
-        healthLabel.setLayoutX(0);
-        healthLabel.setLayoutY(0);
-        healthLabel.setPrefSize(20, 20);
+        healthLabel.setTextFill(Color.WHITE);
+        healthLabel.setFont(new Font("CASTELLAR",30));
+        healthBox.getChildren().addAll(health,healthLabel);
+        
+        
+        HBox velocityBox = new HBox();
+        velocityBox.setPrefHeight(50);
+        velocityBox.setPrefWidth(400);
+        velocityBox.setLayoutX(screenwidth-velocityBox.getPrefWidth());
+        velocityBox.setLayoutY(screenheight-velocityBox.getPrefHeight());
+        Label velocity = new Label();
+        velocity.setText("Velocity:  ");
+        velocity.setTextFill(Color.WHITE);
+        velocity.setFont(new Font("CASTELLAR",30));
+        velocityBox.getChildren().add(velocity);
         Label velocityLabel = new Label();
-        velocityLabel.setPrefHeight(30);
-        velocityLabel.setPrefWidth(30);
-        velocityLabel.setLayoutX(screenwidth-velocityLabel.getPrefWidth());
-        velocityLabel.setLayoutY(screenheight-velocityLabel.getPrefHeight());
         velocityLabel.setText("0");
+        velocityLabel.setTextFill(Color.WHITE);
+        velocityLabel.setFont(new Font("CASTELLAR",30));
         velocityLabel.textProperty().bindBidirectional(this.player.physics.xvel);
-        Label scoreLabel = new Label();
-        scoreLabel.setPrefHeight(30);
-        scoreLabel.setPrefWidth(100);
-        scoreLabel.setLayoutX(0+velocityLabel.getPrefWidth());
-        scoreLabel.setLayoutY(screenheight-velocityLabel.getPrefHeight());
-        scoreLabel.setText("Score: "+String.valueOf(score));
-        this.GUI.getChildren().add(healthLabel);
-        this.GUI.getChildren().add(velocityLabel);
-        this.GUI.getChildren().add(scoreLabel);
+        velocityBox.getChildren().add(velocityLabel);
+        Label speedmeamnt = new Label();
+        speedmeamnt.setText("m/s");
+        speedmeamnt.setTextFill(Color.WHITE);
+        speedmeamnt.setFont(new Font("CASTELLAR",30));
+        velocityBox.getChildren().add(speedmeamnt);
+        /*Label lives = new Label();
+        lives.setPrefHeight(30);
+        lives.setPrefWidth(100);
+        lives.setLayoutX(screenwidth-(lives.getPrefWidth()*3));
+        lives.setLayoutY(screenheight-lives.getPrefHeight());
+        lives.setText("Lives: 1");
+        lives.setTextFill(Color.WHITE);
+        lives.setFont(new Font("Arial",30));*/
+        
+        //this.GUI.getChildren().add(lives);
+        this.GUI.getChildren().add(scoreBox);
+        this.GUI.getChildren().add(velocityBox);
+        this.GUI.getChildren().add(bulletBox);
+        this.GUI.getChildren().add(healthBox);
     }
     @Override
     public void updateLocation(double time){
@@ -62,22 +125,13 @@ public class Camera extends Entity{
         PlayerSyncX(time);
         PlayerSyncY(time);
         
-        
     }
+    //Syncs camera movement to player movement
     private void PlayerSyncX(double time){
-        if(this.player.getX() < this.getRightSide()*0.2){//System.out.println("Player is at back of camera, stopping camera x movement to allow player to go forward.");  
-        }
-        if(this.player.getX() > this.getRightSide()*0.2 && this.player.getX() < this.getRightSide()*0.75){
-            //System.out.println("Player is around middle of camera, resuming x movement.");
-            this.physics.setAccelerationX(this.player.physics.getAccelerationX());
-            this.physics.calculateNetX(time);
-        }
-        else if(this.player.getX() >= this.getRightSide()*0.75){
-            //System.out.println("Player is too far ahead, matching camera speed to player speed.");
-            this.physics.setVelocityX(this.player.physics.getVelocityX());
-            this.physics.calculateNetX(time);
-        }   
+        this.physics.setVelocityX(this.player.physics.getVelocityX());
+        this.physics.calculateNetX(time);
     }
+    //Syncs camera movement to react to player movements
     private void PlayerSyncY(double time){
         double TopB = this.getTop()+(this.getBottom()*0.3);
         double BottomB = this.getBottom()*0.7;
@@ -102,6 +156,7 @@ public class Camera extends Entity{
         this.physics.calculateNetY(time);
     }
     @Override
+    //relocates player, gui, and camera at once.
     public void updateVisual(){
         this.pane.relocate(-this.getX(), -this.getY());
         this.GUI.relocate(this.getX(), this.getY());

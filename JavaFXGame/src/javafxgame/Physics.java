@@ -15,9 +15,9 @@ public class Physics {
     double mass = 2.0;
     double accelerationX;
     double accelerationY;
-    double velocityX;
+    float velocityX;
     StringProperty xvel = new SimpleStringProperty();
-    double velocityY;
+    float velocityY;
     double netForceX;
     double netForceY;
     Entity entity;
@@ -51,12 +51,12 @@ public class Physics {
         {return this.accelerationY;}
     
     public synchronized void setVelocityX(double value)
-        {this.velocityX = value; xvel.set(String.valueOf(value));}
+        {this.velocityX = (float) value; xvel.set(String.valueOf((int)value));}
     public synchronized double getVelocityX()
         {return this.velocityX;}
     
     public synchronized void setVelocityY(double value)
-        {this.velocityY = value;}
+        {this.velocityY = (float) value;}
     public synchronized double getVelocityY()
         {return this.velocityY;}
     

@@ -15,25 +15,16 @@ import javafx.scene.shape.Rectangle;
  */
 public class Enemies extends Entity{
     ArrayList<Rectangle> eyes = new ArrayList<Rectangle>();
-    public Enemies(int x, int y, int width, int height, String name, String directory) throws FileNotFoundException {
-        super(x, y, width, height, name, directory);
-        this.setVisual(directory+"\\src\\javafxgame\\GameArt\\Player.png");
-        createEyes();
-        System.out.println("New Enemy created at "+x+" "+y);
+    Level currentLevel;
+    double cooldownTimer = 5;
+    double cooldown = cooldownTimer;
+    public Enemies(int x, int y, int width, int height, String name, Level currentLevel) throws FileNotFoundException {
+        super(x, y, width, height, name);
+        this.currentLevel = currentLevel;
+        this.setVisual(directory+"\\GameArt\\enemy.png");
+        
     }
-    private void createEyes(){
-        Rectangle top = new Rectangle(this.x,this.y-100,this.width,100);
-        Rectangle bottom = new Rectangle(this.x,this.getBottom(),this.width,100);
-        eyes.add(top);
-        eyes.add(bottom);
-    }
-    public void findPlayer(Player player){
-        if(eyes.get(0).getLayoutBounds().intersects(player.getX(), player.getY(), player.width, player.height)){
-            System.out.println("Fire bullet");
-        }
-        if(eyes.get(1).getLayoutBounds().intersects(player.getX(), player.getY(), player.width, player.height)){
-            System.out.println("Fire bullet");
-        }
+    public void findPlayer(Player player) throws FileNotFoundException{
         
     }
 }

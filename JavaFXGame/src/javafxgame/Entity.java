@@ -19,38 +19,39 @@ import javafx.scene.image.ImageView;
  *
  * @author tchoa
  */
+//Standard entity class all entities inherit from
 public class Entity {
     double x;
     double y;
     double width;
     double height;
     String name;
-    String directory;
+    String directory = System.getProperty("user.dir");
     int health;
     StringProperty healthProperty = new SimpleStringProperty();
     Physics physics = new Physics(this);
     Image image;
-    ImageView entityVisual;
-    Entity(int x, int y, int width, int height, String name, double xVel, double yVel, String directory) throws FileNotFoundException{
+    ImageView entityVisual = new ImageView();
+    //for entities with predefined static movement
+    Entity(double x, double y, int width, int height, String name, double xVel, double yVel) throws FileNotFoundException{
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.name = name;
-        this.directory = directory;
         this.physics.setVelocityX(xVel);
         this.physics.setVelocityY(yVel);
-        this.setVisual(this.directory+"\\src\\javafxgame\\GameArt\\Wall.png");
+        this.setVisual(this.directory+"\\GameArt\\Wall.png");
         this.setHealth(100);
     }
-    Entity(int x, int y, int width, int height, String name, String directory) throws FileNotFoundException{
+    //for entities with no movement.
+    Entity(double x, double y, int width, int height, String name) throws FileNotFoundException{
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.name = name;
-        this.directory = directory;
-        this.setVisual(this.directory+"\\src\\javafxgame\\GameArt\\Wall.png");
+        this.setVisual(this.directory+"\\GameArt\\Wall.png");
         this.setHealth(100);
     }
     public void setHealth(int value){
@@ -84,8 +85,9 @@ public class Entity {
         this.entityVisual.setFitWidth(this.width);
     }   
     public void setVisual(String value) throws FileNotFoundException{
-        this.image = new Image(new FileInputStream(value));
-        this.entityVisual = new ImageView(image);
+        //System.out.println(value);
+        Image newIMG = new Image(new FileInputStream(value));
+        this.entityVisual.setImage(newIMG);
         this.entityVisual.setFitWidth(this.width);
         this.entityVisual.setFitHeight(this.height);
     }
@@ -99,6 +101,8 @@ public class Entity {
     public ImageView getVisual(){
         return this.entityVisual;
     }
+    
+//following are for collision calculations
     public double getTop(){
         return this.getY();
     }
