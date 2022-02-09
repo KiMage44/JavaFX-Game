@@ -9,6 +9,7 @@ import javafx.scene.layout.Pane;
 
 public class Menu extends Pane{
     Menu(String name, int x, int y, int width, int height){
+        System.out.println("It must be nice");
         this.setPrefWidth(width);
         this.setPrefHeight(height);
         this.setLayoutX(x);
